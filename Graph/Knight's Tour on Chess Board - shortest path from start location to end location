@@ -1,0 +1,78 @@
+/*
+You are given the following inputs: 
+number of rows, number of columns, starting locationx,starting locationy, ending locationx, ending locationy.
+The goal is to then calculate and print the shortest path that the knight can take to get to the target location.
+Return -1 if there is no such path.
+*/
+
+/*
+ * Complete the function below.
+ */
+
+    static int minimumMoves(int rows, int cols, int startx, int starty, int endx, int endy) {
+        Set<Integer> used = new HashSet<>();
+        Queue<int[]> q = new LinkedList<>();
+        int delimeter = -1;
+        q.add(new int[]{startx,starty});
+        //add to used when I enqueue
+        int currId = getId(startx,starty,cols);
+        used.add(currId);
+        q.add(new int[]{delimeter,delimeter});
+        int numOfMoves=0;
+        return BFS(endx, endy , rows, cols, used,  q, numOfMoves);
+    }
+    static int BFS(int endx, int endy, int rows, int cols, Set<Integer> used, Queue<int[]> q, int numOfMoves){
+        while(!q.isEmpty()){
+            int[] item = q.poll();
+            int currx = item[0];
+            int curry = item[1];
+            if(isDelimeter(item)){
+                numOfMoves++;
+                if(!q.isEmpty()){
+                    q.add(new int[]{-1, -1});
+                }
+                continue;
+            }
+            if(currx == endx && curry == endy){
+                return numOfMoves;
+            }
+
+                List<int[]> children = getValidMoves(currx, curry, rows, cols);
+                for(int[] child: children){
+                    int childId = getId(child[0],child[1],cols);
+                    //to avoid duplicates in the queue
+                    if(!used.contains(childId)){
+                        q.add(child);
+                        used.add(childId);
+                    }
+                }
+        }
+        return -1;
+    }
+
+    static boolean isDelimeter(int[] item){
+        return item[0]== -1 && item[1] ==-1;
+    }
+    static int getId(int currx, int curry, int cols){
+        return currx*cols + curry;
+    }
+    static List<int[]> getValidMoves(int currx, int curry, int rows, int cols){
+        List<int[]> l  = new ArrayList<>();
+        List<int[]> possibleMoves = new ArrayList<>();
+        possibleMoves.add(new int[]{2,1});
+        possibleMoves.add(new int[]{2, -1});
+        possibleMoves.add(new int[]{-2,1});
+        possibleMoves.add(new int[]{-2, -1});
+        possibleMoves.add(new int[]{1,2});
+        possibleMoves.add(new int[]{-1,2});
+        possibleMoves.add(new int[]{1, -2});
+        possibleMoves.add(new int[]{-1, -2});
+        for(int[] pair: possibleMoves){
+            int proposedX = currx+pair[0];
+            int proposedY = curry+pair[1];
+            if(proposedX >=0 && proposedX < rows && proposedY>=0 && proposedY<cols){
+                l.add(new int[]{proposedX, proposedY});
+            }
+        }
+        return l;
+    }
